@@ -105,67 +105,67 @@ new obj1.print(); // -> {}
 
 In JavaScript, the method is a function stored in a property of an object. When calling the method, this becomes the object that the method belongs to.
 
-    1a.  Object literal
-    ```
-    const calculate = {
-      array: [1, 2, 3],
-      sum: () => {
-        console.log(this === window); // => true
-        return this.array.reduce((result, item) => result + item);
-      }
-    };
+ 1a.  Object literal
+```
+const calculate = {
+  array: [1, 2, 3],
+  sum: () => {
     console.log(this === window); // => true
-    // Throws "TypeError: Cannot read property 'reduce' of undefined"
-    calculate.sum();
-    ```
-    calculate.sum method is defined with an arrow function. But on invocation calculate.sum() throws a TypeError, because this.array is evaluated to undefined.
-    When invoking the method sum() on the calculate object, the context remains window. It happens because the arrow function binds the context lexically with the window object.
-    Executing this.array is equivalent to window.array, which is undefined.
+    return this.array.reduce((result, item) => result + item);
+  }
+};
+console.log(this === window); // => true
+// Throws "TypeError: Cannot read property 'reduce' of undefined"
+calculate.sum();
+```
+calculate.sum method is defined with an arrow function. But on invocation calculate.sum() throws a TypeError, because this.array is evaluated to undefined.
+When invoking the method sum() on the calculate object, the context remains window. It happens because the arrow function binds the context lexically with the window object.
+Executing this.array is equivalent to window.array, which is undefined.
 
-    The solution is to use a function expression or shorthand syntax for method definition (available in ECMAScript 6). In such a case this is determined by the invocation, but not by the enclosing context. Let’s see the fixed version:
-    ```
-    const calculate = {  
-      array: [1, 2, 3],
-      sum() {
-        console.log(this === calculate); // => true
-        return this.array.reduce((result, item) => result + item);
-      }
-    };
-    calculate.sum(); // => 6
-    ```
-    Because sum is a regular function, this on invocation of calculate.sum() is the calculate object. this.array is the array reference, therefore the sum of elements is calculated correctly: 6.
-    
-    1b. Object Prototype
-    
-    The same rule applies when defining methods on a prototype object.
-    Instead of using an arrow function for defining sayCatName method, which brings an incorrect context window:
-    
-    ```
-    function MyCat(name) {
-      this.catName = name;
-    }
-    MyCat.prototype.sayCatName = () => {
-      console.log(this === window); // => true
-      return this.catName;
-    };
-    const cat = new MyCat('Mew');
-    cat.sayCatName(); // => undefined
-    ```
-    
-    use the old school function expression:
-    ```
-    function MyCat(name) {
-      this.catName = name;
-    }
-    MyCat.prototype.sayCatName = function() {
-      console.log(this === cat); // => true
-      return this.catName;
-    };
-    const cat = new MyCat('Mew');
-    cat.sayCatName(); // => 'Mew'
-    ```
-    
-    sayCatName regular function is changing the context to cat object when called as a method: cat.sayCatName().
+The solution is to use a function expression or shorthand syntax for method definition (available in ECMAScript 6). In such a case this is determined by the invocation, but not by the enclosing context. Let’s see the fixed version:
+```
+const calculate = {  
+  array: [1, 2, 3],
+  sum() {
+    console.log(this === calculate); // => true
+    return this.array.reduce((result, item) => result + item);
+  }
+};
+calculate.sum(); // => 6
+```
+Because sum is a regular function, this on invocation of calculate.sum() is the calculate object. this.array is the array reference, therefore the sum of elements is calculated correctly: 6.
+
+ 1b. Object Prototype
+
+The same rule applies when defining methods on a prototype object.
+Instead of using an arrow function for defining sayCatName method, which brings an incorrect context window:
+
+```
+function MyCat(name) {
+  this.catName = name;
+}
+MyCat.prototype.sayCatName = () => {
+  console.log(this === window); // => true
+  return this.catName;
+};
+const cat = new MyCat('Mew');
+cat.sayCatName(); // => undefined
+```
+
+use the old school function expression:
+```
+function MyCat(name) {
+  this.catName = name;
+}
+MyCat.prototype.sayCatName = function() {
+  console.log(this === cat); // => true
+  return this.catName;
+};
+const cat = new MyCat('Mew');
+cat.sayCatName(); // => 'Mew'
+```
+
+sayCatName regular function is changing the context to cat object when called as a method: cat.sayCatName().
     
 2. Callback functions with dynamic context
 
