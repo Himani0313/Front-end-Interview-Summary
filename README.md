@@ -240,3 +240,167 @@ const double = multiply(2);
 double(3);      // => 6
 multiply(2, 3); // => 6
 ```
+
+## var let const
+
+1. var
+ 1a. var variables can be re-declared and updated
+ 1b. var variables are hoisted to the top of its scope and initialized with a value of undefined
+ 
+problems with var - 
+```
+var greeter = "hey hi";
+var times = 4;
+
+if (times > 3) {
+    var greeter = "say Hello instead"; 
+}
+
+console.log(greeter) //"say Hello instead"
+```
+So, since times > 3 returns true, greeter is redefined to "say Hello instead". While this is not a problem if you knowingly want greeter to be redefined, it becomes a problem when you do not realize that a variable greeter has already been defined before. 
+If you have use greeter in other parts of your code, you might be surprised at the output you might get. This might cause a lot of bugs in your code. This is why the let and const is necessary.
+
+2. let
+ 2a. let is block scoped
+ 2b. let can be updated but not re-declared.
+ 2c. Hoisting of let
+Just like var, let declarations are hoisted to the top. Unlike var which is initialized as undefined, the let keyword is not initialized. So if you try to use a let variable before declaration, you'll get a Reference Error
+
+3. Const
+ 3a. const declarations are block scoped
+ 3b. const cannot be updated or re-declared (values can be updated in object, not directly for the const)
+ 3c. Just like let, const declarations are hoisted to the top but are not initialized.
+ 
+So just in case, you missed the differences, here they are :
+
+ * var declarations are globally scoped or function scoped while let and const are block scoped.
+
+ * var variables can be updated and re-declared within its scope; let variables can be updated but not re-declared; const variables can neither be updated nor re-declared.
+
+ * They are all hoisted to the top of their scope but while varvariables are initialized with undefined, let and const variables are not initialized.
+
+ * While var and let can be declared without being initialized, const must be initialized during declaration.
+ 
+
+## variable hoisting
+
+JavaScript Engine does its job in two phases: the memory creation phase and the execution phase, and that our code won’t be executed until the second phase.
+
+```
+console.log(x)
+
+// ReferenceError: x is not defined
+```
+
+```
+console.log(x)
+var x
+
+// undefined
+```
+The key here is that x is defined and available before its declaration — yes, this is a legitimate example of hoisting. Hence, the example 2 is practically same as:
+```
+var x
+console.log(x)
+```
+
+Value of x to undefined is set by JavaScript engine. During the memory creation phase, it recognises variable declarations as it reads the code, initialises them to undefined and puts them into memory to be used during the execution phase.
+
+**initialisations are not hoisted**
+```
+console.log(x)
+var x = 10
+
+// undefined
+```
+During the memory creation phase, the JavaScript engine recognised the declaration of x (var x), automatically initialised x to undefined, and made it available. However, as the initialisation (= 10) didn’t get hoisted, value of x stayed as undefined when the execution reached console.log at line 1.
+
+## Function Hoisting
+```
+sayHello()
+
+function sayHello () {
+  function hello () {
+    console.log('Hello!')
+  }
+  
+  hello()
+  
+  function hello () {
+    console.log('Hey!')
+  }
+}
+```
+Returns ----> 'Hey!'
+
+```
+sayHello()
+
+function sayHello () {
+  function hello () {
+    console.log('Hello!')
+  }
+  
+  hello()
+  
+  var hello = function () {
+    console.log('Hey!')
+  }
+}
+```
+Returns ----> 'Hello!'
+
+```
+sayHello()
+
+var sayHello = function () {
+  function hello () {
+    console.log('Hello!')
+  }
+  
+  hello()
+  
+  function hello () {
+    console.log('Hey!')
+  }
+}
+```
+Returns ---> TypeError
+
+*Function Declaration vs Function Expression*
+There are two ways to define a function with the function keyword in JavaScript — function declaration and function expression.
+A function declaration starts with the function keyword, followed by the name of the function (sayHello), then a block of code to be executed when the function is called ({ console.log('Hello!') }).
+
+On the other hand, a function expression allows you to define a function without a name and as part of non-functional code blocks. A typical usage of a function expression is to assign a function to a variable. Below, I’m defining an anonymous function, that is, function without a name, (function () { console.log(Hello!) }) and assigning it to a variable (var sayHello =), so I can refer to the function via sayHello later on.
+```
+var sayHello = function() {
+  console.log('Hello!')
+}
+```
+
+**Explanation**
+During the memory creation phase, the JavaScript engine recognised a function declaration by the function keyword and hoisted it — in other words, the JavaScript engine made the function available by putting it into the memory, before moving on. That’s why could access the sayHello function prior to its declaration in the execution phase.
+```
+sayHello()
+
+function sayHello () {
+  console.log('Hello!')
+}
+
+// Hello!
+```
+
+*Function Expressions are Not Hoisted*
+```
+sayHello()
+
+var sayHello = function () {
+  console.log('Hello!')
+}
+
+// TypeError
+```
+
+During the memory creation phase, the JavaScript engine encounters the var keyword at line 3, at which point it expects a variable declaration to follow. JavaScript engine when encounters a variable declaration it hoists the variable with a value: undefined. And it doesn’t hoist the variable initiation.
+The variable declaration (var sayHello) was hoisted with a value undefined. However, the variable initialisation (= function () { console.log(Hello!) }) wasn’t hoisted. Therefore, when the execution reached line 1 and tried to call sayHello, it failed, because undefined is not a function! Only after the sayHello variable is assigned to a function expression during the execution at line 3, can we call the function by sayHello(). 
