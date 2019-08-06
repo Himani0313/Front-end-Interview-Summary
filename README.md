@@ -559,7 +559,19 @@ multiplyByTwo(3);
 multiplyByThree = multiply(3);
 multiplyByThree(3);
 ```
-
+### Practical Closures
+Most of the code on the web is eventbased- some behavior and then attach it to event
+```
+function makeSize(size) {
+    return function() {
+        document.body.style.fontSize = size+'px';
+    }
+ }
+ var size12 = makeSize(12);
+ 
+ document.getElementById(' ').onClick = size12;
+ ```
+ 
 
 ## Call, Apply, Bind
 
@@ -687,3 +699,29 @@ render() {
      }.bind(this));
 }
 ```
+
+
+## Immediately Invoked Functions(IIFE)
+
+```
+// Normal function
+function addTogether() {
+ var x = 20;
+ var y = 20;
+ var answer = x + y;
+ console.log(answer);
+ }
+addTogether();
+
+//IIFE
+(function addTogether() {
+ var x = 20;
+ var y = 20;
+ var answer = x + y;
+ console.log(answer);
+ });
+```
+This is actually the first part of creating what is known as a function expression. Now at the moment, it’s not quite your typical function expression, in that function expressions will usually be anonymous. What we have here is called a named function expression. How many more times do you think we can say function expression in the space of a minute? Function expression, function expression, function expression.
+Anyway, so because we are creating one of those function expression things that I just said about ten times, we don’t actually need to give the function a name anymore, because the plan is that once we’ve created an IIFE, we have no intention of calling the function again.
+
+An Immediately Invoked Function Expression is a good way at protecting the scope of your function and the variables within it.
