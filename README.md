@@ -404,3 +404,158 @@ var sayHello = function () {
 
 During the memory creation phase, the JavaScript engine encounters the var keyword at line 3, at which point it expects a variable declaration to follow. JavaScript engine when encounters a variable declaration it hoists the variable with a value: undefined. And it doesn’t hoist the variable initiation.
 The variable declaration (var sayHello) was hoisted with a value undefined. However, the variable initialisation (= function () { console.log(Hello!) }) wasn’t hoisted. Therefore, when the execution reached line 1 and tried to call sayHello, it failed, because undefined is not a function! Only after the sayHello variable is assigned to a function expression during the execution at line 3, can we call the function by sayHello(). 
+
+## SCOPE
+
+1. Global Scope
+The global scope is the outermost scope and is pre-defined even before you write a single line of code. (Window)
+Global variables can be accessed and modified from any other scope.
+```
+// Global scope
+
+var greet = 'Hello!' // Globally scoped
+
+function changeGreet () {
+  console.log('2: ', greet) // Accessible
+  greet = 'Hey!' // Modified
+  console.log('3: ', greet) // Accessible
+}
+
+console.log('1: ', greet) // Accessible
+changeGreet()
+console.log('4: ', greet) // Accessible
+
+// 1: Hello! 
+// 2: Hello!
+// 3: Hey!
+// 4: Hey!
+```
+
+2. Local Scope
+Local scope is any scope created within the global scope. Every time a new function is declared, a new local scope gets created, and variables declared inside the function belong to that unique scope.
+During the execution phase, local variables can only be accessed and modified within the same scope. As soon as the JavaScript engine finishes executing a function, it exits the local scope and moves back to the global scope, losing access to the variables within that local scope.
+```
+// Global scope
+
+function sayHi () {
+  // Local scope
+  
+  var greet = 'Hello!' // Localy scoped
+  console.log('1: ', greet) // Accessible within the same scope
+  
+  greet = 'Hey!' // Modified within the same scope
+  console.log('2: ', greet) // Accessible within the same scope
+}
+
+sayHi()
+console.log('3: ', greet) // NOT accessible from outside the scope (global scope)
+
+// 1: Hello!
+// 2: Hey!
+// ReferenceError: greet is not defined
+```
+
+can have multiple local scopes within the global scope. Each local scope is an isolated entity, so variables that belong to a scope is confined to that specific scope.
+
+**Hoisting and Scope**
+```
+var greet = 'Hello!'
+
+function sayHi () {
+  console.log('2: ', greet)
+  var greet = 'Ciao!'
+  console.log('3: ', greet)
+}
+
+console.log('1: ', greet)
+sayHi()
+console.log('4: ', greet)
+
+
+////////
+1: Hello!
+2: undefined
+3: Ciao!
+4: Hello!
+```
+
+## Execution Context ≠ Scope
+It’s easier to demonstrate this with an example rather than with a wall of text. At this point, we just need to keep in mind that the following events happen, as the JavaScript engine starts to read your code.
+The global execution context is created before any code is executed.
+Whenever a function is executed (or called/invoked, these are all synonyms), a new execution context gets created.
+Every execution context provides this keyword, which points to an object to which the current code that’s being executed belongs.
+
+```
+var globalThis = this
+
+function myFunc () {  
+  console.log('globalThis: ', globalThis)
+  console.log('this inside: ', this)
+  console.log(globalThis === this)
+}
+
+myFunc()
+
+// globalThis: Window {...}
+// this inside: Window {...}
+// true
+```
+**_In JavaScript, execution context is an abstract concept that holds information about the environment within which the current code is being executed._**
+
+the JavaScript engine creates the global execution context before it starts to execute any code. From that point on, a new execution context gets created every time a function is executed, as the engine parses through your code. In fact, the global execution context is nothing special. It’s just like any other execution context, except that it gets created by default.
+
+```
+var name = 'John'
+
+function greet (name) {  
+  return (function () {
+    console.log('Hello ' + name)
+  })
+}
+
+var sayHello = greet(name)
+
+name = 'Sam'
+
+sayHello()
+
+\\ Hello John
+```
+
+## Closures
+
+A closure is the combination of a function bundled together (enclosed) with references to its surrounding state (the lexical environment). In other words, a closure gives you access to an outer function’s scope from an inner function. In JavaScript, closures are created every time a function is created, at function creation time.
+To use a closure, define a function inside another function and expose it. To expose a function, return it or pass it to another function.
+The inner function will have access to the variables in the outer function scope, even after the outer function has returned.
+
+**Explaination**
+* When code is run in JavaScript, the environment in which it is executed is very important, and is evaluated as 1 of the following:
+ * Global code — The default environment where your code is executed for the first time.
+ * Function code — Whenever the flow of execution enters a function body.
+ * (…)
+ * (…), let’s think of the term execution context as the environment / scope the current code is being evaluated in.
+
+In other words, as we start the program, we start in the global execution context. Some variables are declared within the global execution context. We call these global variables. When the program calls a function, what happens? A few steps:
+* JavaScript creates a new execution context, a local execution context
+* That local execution context will have its own set of variables, these variables will be local to that execution context.
+* The new execution context is thrown onto the execution stack. Think of the execution stack as a mechanism to keep track of where the program is in its execution
+
+When does the function end? When it encounters a return statement or it encounters a closing bracket }. When a function ends, the following happens:
+* The local execution contexts pops off the execution stack
+* The functions sends the return value back to the calling context. The calling context is the execution context that called this function, it could be the global execution context or another local execution context. It is up to the calling execution context to deal with the return value at that point. The returned value could be an object, an array, a function, a boolean, anything really. If the function has no return statement, undefined is returned.
+* The local execution context is destroyed. This is important. Destroyed. All the variables that were declared within the local execution context are erased. They are no longer available. That’s why they’re called local variables.
+
+
+```
+let multiply = function(x) {
+    return function(y) {
+        console.log(x*y);
+    }
+}
+
+multiplyByTwo = multiply(2);
+multiplyByTwo(3);
+
+multiplyByThree = multiply(3);
+multiplyByThree(3);
+```
