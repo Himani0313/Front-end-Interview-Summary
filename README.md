@@ -559,3 +559,131 @@ multiplyByTwo(3);
 multiplyByThree = multiply(3);
 multiplyByThree(3);
 ```
+
+
+## Call, Apply, Bind
+
+You can use call()/apply() to invoke the function immediately. bind() returns a bound function that, when executed later, will have the correct context ("this") for calling the original function. So bind() can be used when the function needs to be called later in certain events when it's useful.
+
+1. Call
+```
+var obj = {name:"Niladri"};
+
+var greeting = function(a,b,c){
+    return "welcome "+this.name+" to "+a+" "+b+" in "+c;
+};
+
+console.log(greeting.call(obj,"Newtown","KOLKATA","WB"));
+// returns output as welcome Niladri to Newtown KOLKATA in WB
+```
+The first parameter in call() method sets the "this" value, which is the object, on which the function is invoked upon. In this case, it's the "obj" object above.
+
+The rest of the parameters are the arguments to the actual function.
+
+**_Object to Array_**
+```
+[].slice.call(arguments)
+```
+**_Call Base class constructor from Child Class_**
+```
+let mammal = function(legs) {
+    this.legs = legs;
+}
+
+let cat = function(legs, isDomesticated) {
+    mammal.call(this,legs);
+    this.isDomesticated = isDomesticated;
+}
+let lion = new cat(4,false);
+```
+
+2. Apply
+```
+var obj = {name:"Niladri"};
+
+var greeting = function(a,b,c){
+    return "welcome "+this.name+" to "+a+" "+b+" in "+c;
+};
+
+// array of arguments to the actual function
+var args = ["Newtown","KOLKATA","WB"];  
+console.log("Output using .apply() below ")
+console.log(greeting.apply(obj,args));
+
+/* The output will be 
+  Output using .apply() below
+ welcome Niladri to Newtown KOLKATA in WB */
+```
+
+Similarly to call() method the first parameter in apply() method sets the "this" value which is the object upon which the function is invoked. In this case it's the "obj" object above. The only difference of apply() with the call() method is that the second parameter of the apply() method accepts the arguments to the actual function as an array.
+
+**_Apply functions to arrays_**
+```
+let numArray= [1,2,3];
+Math.min(1,2,3) // Allowed but not feasible for arrays
+Math.min.apply(null, numArray);
+```
+
+3. Bind
+```
+var obj = {name:"Niladri"};
+
+var greeting = function(a,b,c){
+    return "welcome "+this.name+" to "+a+" "+b+" in "+c;
+};
+
+//creates a bound function that has same body and parameters 
+var bound = greeting.bind(obj); 
+
+
+console.dir(bound); ///returns a function
+
+console.log("Output using .bind() below ");
+
+console.log(bound("Newtown","KOLKATA","WB")); //call the bound function
+
+/* the output will be 
+Output using .bind() below
+welcome Niladri to Newtown KOLKATA in WB */
+```
+
+In the above code sample for bind() we are returning a bound function with the context which will be invoked later. 
+
+The first parameter to the bind() method sets the value of "this" in the target function when the bound function is called. Please note that the value for first parameter is ignored if the bound function is constructed using the "new" operator.
+The rest of the parameters following the first parameter in bind() method are passed as arguments which are prepended to the arguments provided to the bound function when invoking the target function.
+
+```
+let myObj = {
+    asyncGet(cb) {
+        cb();
+    }
+    parse() {
+        console.log('parse called');
+    }
+    render() {
+        this.asyncGet(function() {
+            this.parse();
+        });
+    }
+}
+
+myObj.render() - Error as this.parse() not a function as this has scope of render
+```
+
+Solution::
+```
+render(){
+    that = this;
+    this.asyncGet(function() {
+        that.parse(;
+    }
+}
+```
+OR
+```
+render() {
+    this.asyncGet(function(){
+        this.parse();
+     }.bind(this));
+}
+```
