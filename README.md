@@ -1,6 +1,8 @@
 # Front-end-Interview-Summary
 Gist of most important javascript concepts
 
+[This KeyWord rules](#THIS Keyword rules)
+[Var let Const](#var let const)
 
 ## THIS Keyword rules
 1. If the new keyword is used when calling the function, this inside the function is a brand new object.
